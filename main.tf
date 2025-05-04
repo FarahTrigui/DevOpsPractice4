@@ -1,21 +1,19 @@
-provider "aws" {
-
-region = "us-east-1"
-
+terraform {
+  required_providers {
+    docker = {
+      source = "kreuzwerker/docker"
+      version = "3.0.2"
+    }
+  }
 }
 
+provider "docker" {}  # Utilise le Docker local
 
-resource "aws_instance" "web" {
-
-ami = "ami-0c55b159cbfafe1f0" # Exemple d'AMI (adapté à votre region)
-
-instance_type = "t2.micro"
-
-
-tags = {
-
-Name = "DevOps-Instance"
-
-}
-
+resource "docker_container" "nginx" {
+  name  = "nginx-test"
+  image = "nginx:latest"
+  ports {
+    internal = 80
+    external = 5000
+  }
 }
