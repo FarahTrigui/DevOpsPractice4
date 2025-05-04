@@ -1,19 +1,13 @@
 ---
-- name: Déployer Docker et l'application
-  hosts: web
-  become: true
+- name: Configurer le conteneur Docker
+  hosts: localhost
+  connection: local
   tasks:
-    - name: Installer Docker
-      apt:
-        name: docker.io
+    - name: Vérifier que Docker est installé
+      package:
+        name: docker-ce
         state: present
-      tags: docker
 
     - name: Démarrer le conteneur
-      docker_container:
-        name: myapp
-        image: nginx:latest  # Exemple avec Nginx
-        ports:
-          - "80:80"
-        state: started
-      tags: docker
+      command: docker start myapp
+      when: "'myapp' in docker_containers"

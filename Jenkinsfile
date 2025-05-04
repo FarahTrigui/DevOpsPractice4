@@ -10,5 +10,10 @@ pipeline {
     stage('Terraform Apply') {
       steps { sh 'terraform apply -auto-approve' }
     }
+    stage('Deploy with Ansible') {
+      steps {
+    sh 'ansible-playbook playbook.yml'
+  }
+}
   }
 }
