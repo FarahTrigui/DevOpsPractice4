@@ -1,0 +1,19 @@
+---
+- name: Déployer Docker et l'application
+  hosts: web
+  become: true
+  tasks:
+    - name: Installer Docker
+      apt:
+        name: docker.io
+        state: present
+      tags: docker
+
+    - name: Démarrer le conteneur
+      docker_container:
+        name: myapp
+        image: nginx:latest  # Exemple avec Nginx
+        ports:
+          - "80:80"
+        state: started
+      tags: docker
