@@ -3,6 +3,8 @@
   hosts: localhost
   connection: local
   become: yes  # Nécessaire pour les opérations d'installation
+  become_method: sudo
+  become_flags: '-n'  # --non-interactive
   tasks:
     - name: Installer les dépendances
       apt:
