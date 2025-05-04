@@ -2,12 +2,51 @@
 - name: Configurer le conteneur Docker
   hosts: localhost
   connection: local
+  become: yes  # Nécessaire pour les opérations d'installation
   tasks:
-    - name: Vérifier que Docker est installé
-      package:
-        name: docker-ce
+    - name: Installer les dépendances
+      apt:
+        name: [
+          apt-transport-https,
+          ca-certificates,
+          curl,
+          software-properties-common
+        ]
+        state: present
+        update_cache: yes
+
+    - name: Ajouter la clé GPG Docker
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
         state: present
 
+    - name: Ajouter le dépôt Docker
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+        filename: docker-ce
+
+    - name: Installer Docker CE
+      apt:
+        name: docker-ce
+        state: present
+        update_cache: yes
+
+    - name: Démarrer le service Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Vérifier l'installation Docker
+      command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Afficher la version Docker
+      debug:
+        msg: "Docker installé : {{ docker_version.stdout }}"
+
     - name: Démarrer le conteneur
-      command: docker start myapp
-      when: "'myapp' in docker_containers"
+      command: docker run -d -p 5000:80 --name myapp nginx:latest
+      when: "'myapp' not in docker_containers.stdout"
